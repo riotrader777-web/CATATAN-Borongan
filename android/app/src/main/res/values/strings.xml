@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Kalkulator Borongan Proyek</string>
+    <string name="title_activity_main">Kalkulator Borongan Proyek</string>
+    <string name="package_name">com.kalkulator.boronganproyek</string>
+    <string name="custom_url_scheme">com.kalkulator.boronganproyek</string>
+</resources>

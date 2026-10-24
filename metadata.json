@@ -1,0 +1,6 @@
+{
+  "name": "Kalkulator Borongan Proyek",
+  "description": "Aplikasi pencatatan 5 proyek borongan, catatan kesepakatan deal dari owner, absensi & gaji karyawan tanpa batasan kuota, gaji karyawan sekali pakai (ngecor/harian lepas), pengeluaran konsumsi dan operasional, serta buku catatan kasbon & cicilan pegawai otomatis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

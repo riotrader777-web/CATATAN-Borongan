@@ -1,0 +1,8 @@
+{
+	"appId": "com.kalkulator.boronganproyek",
+	"appName": "Kalkulator Borongan Proyek",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	}
+}
