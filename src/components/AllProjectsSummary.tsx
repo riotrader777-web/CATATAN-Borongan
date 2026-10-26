@@ -13,7 +13,8 @@ import {
   FileText,
   Printer,
   HardHat,
-  Truck
+  Truck,
+  RotateCcw
 } from 'lucide-react';
 import { ProjectData } from '../types';
 import { formatRupiah, calculateDayWage } from '../utils/formatters';
@@ -21,11 +22,13 @@ import { formatRupiah, calculateDayWage } from '../utils/formatters';
 interface AllProjectsSummaryProps {
   projects: ProjectData[];
   onSelectProject: (id: string) => void;
+  onResetProject?: (project: ProjectData) => void;
 }
 
 export const AllProjectsSummary: React.FC<AllProjectsSummaryProps> = ({
   projects,
   onSelectProject,
+  onResetProject,
 }) => {
   // Compute analytics for each project
   const projectStats = projects.map((p) => {
@@ -344,15 +347,28 @@ export const AllProjectsSummary: React.FC<AllProjectsSummaryProps> = ({
                     </td>
 
                     <td className="p-3 text-center whitespace-nowrap">
-                      <button
-                        type="button"
-                        onClick={() => onSelectProject(project.id)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition shadow-2xs"
-                        title="Buka dan kelola proyek ini"
-                      >
-                        Buka
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => onSelectProject(project.id)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition shadow-2xs"
+                          title="Buka dan kelola proyek ini"
+                        >
+                          Buka
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                        {onResetProject && (
+                          <button
+                            type="button"
+                            onClick={() => onResetProject(project)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition shadow-2xs"
+                            title="Reset data proyek ini jika sudah selesai untuk digunakan kembali"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5 text-rose-600" />
+                            Reset
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

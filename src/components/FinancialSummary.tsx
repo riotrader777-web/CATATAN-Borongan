@@ -17,7 +17,8 @@ import {
   Banknote, 
   Landmark, 
   Truck,
-  ArrowRightLeft
+  ArrowRightLeft,
+  RotateCcw
 } from 'lucide-react';
 import { ProjectData } from '../types';
 import { formatRupiah, parseNumberInput } from '../utils/formatters';
@@ -33,6 +34,7 @@ interface FinancialSummaryProps {
   totalTemporaryWagesExpense?: number;
   totalConcreteExpense?: number;
   onNavigateToTab?: (tab: 'attendance' | 'saturday' | 'temporary' | 'expenses' | 'summary' | 'kasbon' | 'casting') => void;
+  onOpenResetModal?: () => void;
 }
 
 export const FinancialSummary: React.FC<FinancialSummaryProps> = ({
@@ -44,6 +46,7 @@ export const FinancialSummary: React.FC<FinancialSummaryProps> = ({
   totalTemporaryWagesExpense = 0,
   totalConcreteExpense = 0,
   onNavigateToTab,
+  onOpenResetModal,
 }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempNameInput, setTempNameInput] = useState(project.projectName);
@@ -157,6 +160,17 @@ export const FinancialSummary: React.FC<FinancialSummaryProps> = ({
             <Receipt className="w-4 h-4 text-amber-700" />
             Deal Owner & Tarik Tunai
           </button>
+
+          {onOpenResetModal && (
+            <button
+              onClick={onOpenResetModal}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-stone-600 bg-stone-100 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 border border-stone-200 rounded-xl transition shadow-2xs"
+              title="Reset data proyek ini jika sudah selesai untuk digunakan kembali"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-rose-500" />
+              Reset Proyek Selesai
+            </button>
+          )}
 
           {ownerDealAmount === 0 ? (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">

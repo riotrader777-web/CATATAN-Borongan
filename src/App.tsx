@@ -62,6 +62,7 @@ import { TemporaryWorkersSection } from './components/temporary/TemporaryWorkers
 import { ProjectAllocationChart } from './components/ProjectAllocationChart';
 import { ConcreteCastingSection } from './components/casting/ConcreteCastingSection';
 import { ShareSyncModal } from './components/ShareSyncModal';
+import { ResetProjectModal } from './components/ResetProjectModal';
 
 export default function App() {
   const [store, setStore] = useState<MultiProjectStore>(loadMultiProjectStore);
@@ -75,6 +76,9 @@ export default function App() {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isApkModalOpen, setIsApkModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [projectToReset, setProjectToReset] = useState<ProjectData | null>(null);
+  const [toastNotification, setToastNotification] = useState<string | null>(null);
   const [incomingImportData, setIncomingImportData] = useState<any | null>(null);
   const [printSaturdayDate, setPrintSaturdayDate] = useState(selectedSaturday);
 
@@ -476,13 +480,44 @@ export default function App() {
     setIsPrintModalOpen(true);
   };
 
-  // Backup / Reset for active project or all projects
-  const handleResetActiveProject = () => {
-    if (window.confirm(`Yakin ingin mereset data "${activeProject.projectName}"? Semua catatan absensi, termin, dan pengeluaran pada proyek ini akan dikosongkan.`)) {
-      updateActiveProject(() => 
-        createDefaultProject(activeProject.id, activeProject.projectNumber, `Proyek ${activeProject.projectNumber}`)
-      );
-    }
+  // Open dedicated Reset Project Modal for any of the 5 projects
+  const handleOpenResetModal = (project: ProjectData) => {
+    setProjectToReset(project);
+    setIsResetModalOpen(true);
+  };
+
+  const handleConfirmResetProject = (projectId: string, keepWorkers: boolean, newProjectName: string) => {
+    const targetProject = store.projects.find((p) => p.id === projectId);
+    const oldName = targetProject?.projectName || `Proyek ${targetProject?.projectNumber || ''}`;
+
+    setStore((prev) => {
+      const updatedProjects = prev.projects.map((p) => {
+        if (p.id === projectId) {
+          const clean = createDefaultProject(
+            p.id, 
+            p.projectNumber, 
+            newProjectName.trim() || `Proyek ${p.projectNumber}`
+          );
+          if (keepWorkers) {
+            clean.workers = p.workers.map((w) => ({ ...w }));
+          }
+          return clean;
+        }
+        return p;
+      });
+
+      return {
+        ...prev,
+        projects: updatedProjects,
+      };
+    });
+
+    setIsResetModalOpen(false);
+    setProjectToReset(null);
+    setToastNotification(`Data "${oldName}" berhasil direset dan siap untuk proyek baru!`);
+    setTimeout(() => {
+      setToastNotification(null);
+    }, 4500);
   };
 
   const handleExportBackup = () => {
@@ -655,9 +690,9 @@ export default function App() {
 
             <button
               id="reset-project-btn"
-              onClick={handleResetActiveProject}
+              onClick={() => handleOpenResetModal(activeProject)}
               className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition"
-              title="Reset Data Proyek Aktif"
+              title={`Reset Data ${activeProject.projectName}`}
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -684,6 +719,7 @@ export default function App() {
               handleSelectProject(id);
               setShowAllProjectsView(false);
             }}
+            onResetProject={handleOpenResetModal}
           />
         ) : (
           /* View Single Active Project */
@@ -698,6 +734,7 @@ export default function App() {
               totalKonsumsiExpense={totalKonsumsiExpense}
               totalOtherExpense={totalOtherExpense}
               onNavigateToTab={(tab) => setActiveTab(tab)}
+              onOpenResetModal={() => handleOpenResetModal(activeProject)}
             />
 
             {/* Tab Navigation for Active Project */}
@@ -1281,6 +1318,34 @@ export default function App() {
         onApplySingleProject={handleApplySingleProject}
         initialImportData={incomingImportData}
       />
+
+      {/* Modal Reset Proyek Selesai untuk Masing-masing Proyek */}
+      <ResetProjectModal
+        isOpen={isResetModalOpen}
+        project={projectToReset}
+        onClose={() => {
+          setIsResetModalOpen(false);
+          setProjectToReset(null);
+        }}
+        onConfirmReset={handleConfirmResetProject}
+      />
+
+      {/* Floating Success Toast Notification */}
+      {toastNotification && (
+        <div className="fixed bottom-5 right-5 z-50 bg-stone-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-stone-700 text-xs font-bold flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200 max-w-sm">
+          <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-4 h-4" />
+          </div>
+          <span className="flex-1 leading-snug">{toastNotification}</span>
+          <button 
+            type="button" 
+            onClick={() => setToastNotification(null)}
+            className="text-stone-400 hover:text-white p-1"
+          >
+            &times;
+          </button>
+        </div>
+      )}
     </div>
   );
 }
